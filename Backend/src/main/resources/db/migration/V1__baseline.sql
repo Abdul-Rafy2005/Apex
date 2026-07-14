@@ -1,0 +1,2 @@
+-- Apex Database Schema Baseline
+-- This is an empty baseline migration. Subsequent migrations will build on this.

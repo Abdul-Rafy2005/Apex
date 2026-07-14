@@ -44,7 +44,9 @@ Core non-negotiable: **crypto is a data provider, not the product identity.** An
 
 ## 4\. Tech Stack (locked — do not substitute without asking)
 
-**Backend:** Java 21, Spring Boot 3.x, Spring Security + JWT, Spring Data JPA, Flyway, Jakarta Validation, Maven.
+**Backend:** Java 21, Spring Boot 4.x, Spring Security + JWT, Spring Data JPA, Flyway, Jakarta Validation, Maven.
+
+> **Jackson 3 note:** Spring Boot 4.x ships Jackson 3 (`tools.jackson.databind`). Annotation imports remain in `com.fasterxml.jackson.annotation` (e.g., `@JsonIgnoreProperties`, `@JsonProperty`). Core databind imports use `tools.jackson.databind.ObjectMapper` — NOT `com.fasterxml.jackson.databind`. When writing new code or tests, always verify the import path; Jackson 2 and Jackson 3 share the annotation package but have different databind packages.
 **Data:** PostgreSQL 16, Redis 7, RabbitMQ.
 **Real-time:** WebSocket (STOMP/SockJS), Redis pub/sub for multi-instance fan-out.
 **Frontend:** React 18 + TypeScript (strict mode on), Tailwind CSS, TanStack Query, Zustand, Recharts / lightweight-charts.

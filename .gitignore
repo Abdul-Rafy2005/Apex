@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Build output
+build/
+dist/
+*.class
+*.jar
+*.war
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+.settings/
+.classpath
+.project
+.factorypath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test output
+test-results/
+playwright-report/

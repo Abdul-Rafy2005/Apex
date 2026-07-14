@@ -21,7 +21,7 @@ purely infrastructure and scaffolding.
 Scope:
 1. Create the repo structure: /backend (Spring Boot, Java 21, Maven) and /frontend
    (React 18 + TypeScript, Vite).
-2. Backend: initialize Spring Boot 3.x with dependencies for Web, Security, Data JPA,
+2.    Backend: initialize Spring Boot 4.x with dependencies for Web, Security, Data JPA,
    Validation, PostgreSQL driver, Flyway, springdoc-openapi, Lombok, Testcontainers
    (test scope). Set up the feature-based package structure defined in AGENTS.md
    section 5 with empty placeholder packages (auth, organization, market, trading,

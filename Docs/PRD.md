@@ -274,7 +274,7 @@ AuditLog (id, actor_user_id, action, target_user_id, metadata, created_at)
 | Layer | Technology | Notes |
 |---|---|---|
 | Backend language | Java 21 | LTS |
-| Framework | Spring Boot 3.x | |
+| Framework | Spring Boot 4.x | Jackson 3 ships by default; annotations in `com.fasterxml.jackson.annotation`, core databind in `tools.jackson.databind` — verify imports when writing new code |
 | Security | Spring Security + JWT | access + refresh token |
 | ORM | Spring Data JPA / Hibernate | |
 | Migrations | **Flyway** | schema is version-controlled, never `ddl-auto=update` in real environments |

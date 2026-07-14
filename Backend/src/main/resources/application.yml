@@ -1,0 +1,134 @@
+spring:
+  application:
+    name: apex-backend
+
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:apex}
+    username: ${DB_USER:apex}
+    password: ${DB_PASSWORD:apex}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+  jackson:
+    default-property-inclusion: non_null
+
+apex:
+  auth:
+    jwt-secret: ${JWT_SECRET:change-this-to-a-secure-random-string-in-production}
+    jwt-access-token-expiration-ms: 900000
+    jwt-refresh-token-expiration-ms: 604800000
+    seed-balance: 100000
+  market:
+    coingecko:
+      base-url: ${COINGECKO_BASE_URL:https://api.coingecko.com/api/v3}
+      api-key: ${COINGECKO_API_KEY:}
+    ingestion:
+      interval-ms: 60000
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api/v1/api-docs
+  swagger-ui:
+    path: /api/v1/swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    com.abdulrafy.backend: INFO
+    org.springframework.security: WARN
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    locations: classpath:db/migration
+
+logging:
+  level:
+    com.abdulrafy.backend: DEBUG
+    org.springframework.security: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/apex_test
+    username: apex_test
+    password: apex_test
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  jpa:
+    show-sql: true
+
+  flyway:
+    locations: classpath:db/migration
+
+logging:
+  level:
+    com.abdulrafy.backend: DEBUG
+    org.testcontainers: INFO
