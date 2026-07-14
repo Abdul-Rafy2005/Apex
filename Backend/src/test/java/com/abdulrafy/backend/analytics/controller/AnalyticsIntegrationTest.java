@@ -191,7 +191,10 @@ class AnalyticsIntegrationTest extends IntegrationTestBase {
                 .content(objectMapper.writeValueAsString(buyReq)))
                 .andExpect(status().isCreated());
 
-        analyticsService.recomputeSnapshot(portfolioId);
+        for (int i = 0; i < 50; i++) {
+            Thread.sleep(100);
+            if (snapshotRepository.findTopByPortfolioIdOrderBySnapshotDateDesc(portfolioId).isPresent()) break;
+        }
 
         // Register User B
         String emailB = "analytics-b-" + UUID.randomUUID() + "@test.com";
