@@ -359,5 +359,3 @@ Apex's frontend must **not** look like a generic AI-generated dashboard. It shou
 - Email/push notifications
 
 ---
-
-*This PRD is the source of truth for scope. The companion `AGENTS.md` defines how the AI coding agent must build it, and `IMPLEMENTATION_PLAN.md` defines the order and testable checkpoints.*
