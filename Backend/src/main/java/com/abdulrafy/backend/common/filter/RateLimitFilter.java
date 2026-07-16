@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 public class RateLimitFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
 
     private final StringRedisTemplate redisTemplate;
     private final int registerLimit;
@@ -57,32 +61,36 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         String key = rule.key();
-        long count = redisTemplate.opsForValue().increment(key);
-        if (count == 1) {
-            redisTemplate.expire(key, windowSeconds, TimeUnit.SECONDS);
-        }
+        try {
+            long count = redisTemplate.opsForValue().increment(key);
+            if (count == 1) {
+                redisTemplate.expire(key, windowSeconds, TimeUnit.SECONDS);
+            }
 
-        response.setHeader("X-RateLimit-Limit", String.valueOf(rule.maxRequests()));
-        response.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, rule.maxRequests() - count)));
-        response.setHeader("X-RateLimit-Window", String.valueOf(windowSeconds));
+            response.setHeader("X-RateLimit-Limit", String.valueOf(rule.maxRequests()));
+            response.setHeader("X-RateLimit-Remaining", String.valueOf(Math.max(0, rule.maxRequests() - count)));
+            response.setHeader("X-RateLimit-Window", String.valueOf(windowSeconds));
 
-        if (count > rule.maxRequests()) {
-            response.setHeader("Retry-After", String.valueOf(windowSeconds));
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+            if (count > rule.maxRequests()) {
+                response.setHeader("Retry-After", String.valueOf(windowSeconds));
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
 
-            String body = """
-                {
-                    "type": "https://api.apex.com/errors/rate-limit-exceeded",
-                    "title": "rate-limit-exceeded",
-                    "status": 429,
-                    "detail": "Too many requests. Please try again in %d seconds.",
-                    "instance": "%s",
-                    "timestamp": "%s"
-                }
-                """.formatted(windowSeconds, path, Instant.now().toString());
-            response.getWriter().write(body);
-            return;
+                String body = """
+                    {
+                        "type": "https://api.apex.com/errors/rate-limit-exceeded",
+                        "title": "rate-limit-exceeded",
+                        "status": 429,
+                        "detail": "Too many requests. Please try again in %d seconds.",
+                        "instance": "%s",
+                        "timestamp": "%s"
+                    }
+                    """.formatted(windowSeconds, path, Instant.now().toString());
+                response.getWriter().write(body);
+                return;
+            }
+        } catch (Exception e) {
+            log.warn("Rate limiter unavailable for key={}: {}. Failing open — request allowed.", key, e.getMessage());
         }
 
         filterChain.doFilter(request, response);

@@ -51,7 +51,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, RateLimitFilter rateLimitFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            @org.springframework.beans.factory.annotation.Autowired(required = false) RateLimitFilter rateLimitFilter) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
@@ -65,8 +66,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint));
+
+        if (rateLimitFilter != null) {
+            http.addFilterAfter(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
+        }
 
         return http.build();
     }

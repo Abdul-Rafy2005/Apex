@@ -116,6 +116,13 @@ apex:
   frontend:
     origin: ${FRONTEND_ORIGIN:http://localhost:5173}
 
+  ratelimit:
+    register: 999999
+    login: 999999
+    trade: 999999
+    journal: 999999
+    window-seconds: 60
+
   datasource:
     url: jdbc:postgresql://localhost:5432/apex_test
     username: apex_test
