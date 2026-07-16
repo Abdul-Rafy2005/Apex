@@ -8,6 +8,8 @@ import { usePriceStream } from '../hooks/usePriceStream';
 vi.mock('../hooks/useMarket', () => ({
   useAssets: vi.fn(),
   useAssetPrices: vi.fn(),
+  useGlobalSearch: vi.fn().mockReturnValue({ data: [], isLoading: false }),
+  useAddAsset: vi.fn().mockReturnValue({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock('../hooks/usePriceStream', () => ({
