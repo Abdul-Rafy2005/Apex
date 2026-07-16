@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { ApiError } from '@/features/auth/api/auth.api';
 import { Button } from '@/components/ui/Button';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 export function LoginForm({ onSwitch }: { onSwitch: () => void }) {
   const login = useAuthStore((s) => s.login);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -16,11 +18,20 @@ export function LoginForm({ onSwitch }: { onSwitch: () => void }) {
     setError(null);
     try {
       await login(email, password);
+      setEmail('');
+      setPassword('');
+      navigate('/');
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message);
+        if (err.status === 401) {
+          setError('Invalid email or password');
+        } else if (err.status === 429) {
+          setError('Too many login attempts. Please wait and try again.');
+        } else {
+          setError('Something went wrong. Please try again.');
+        }
       } else {
-        setError('An unexpected error occurred');
+        setError('Something went wrong. Please try again.');
       }
     }
   }

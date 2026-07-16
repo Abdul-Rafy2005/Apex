@@ -44,4 +44,16 @@ public class MarketController {
             @RequestParam(defaultValue = "30") int days) {
         return marketService.getHistory(symbol, days);
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search CoinGecko for global assets")
+    public List<GlobalAssetResponse> searchGlobal(@RequestParam String query) {
+        return marketService.searchGlobalAssets(query);
+    }
+
+    @PostMapping("/assets")
+    @Operation(summary = "Add a new asset to the database")
+    public AssetResponse addAsset(@jakarta.validation.Valid @RequestBody AddAssetRequest request) {
+        return marketService.addAsset(request);
+    }
 }

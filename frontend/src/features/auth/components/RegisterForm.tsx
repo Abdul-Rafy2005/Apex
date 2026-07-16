@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { ApiError } from '@/features/auth/api/auth.api';
 import { Button } from '@/components/ui/Button';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 export function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const register = useAuthStore((s) => s.register);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,11 +34,21 @@ export function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
 
     try {
       await register(email, password, displayName);
+      setDisplayName('');
+      setEmail('');
+      setPassword('');
+      navigate('/');
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message);
+        if (err.status === 409) {
+          setError('An account with this email already exists');
+        } else if (err.status === 429) {
+          setError('Too many login attempts. Please wait and try again.');
+        } else {
+          setError('Something went wrong. Please try again.');
+        }
       } else {
-        setError('An unexpected error occurred');
+        setError('Something went wrong. Please try again.');
       }
     }
   }

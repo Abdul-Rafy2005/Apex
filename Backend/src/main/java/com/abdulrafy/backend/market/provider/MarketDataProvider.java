@@ -19,4 +19,6 @@ public interface MarketDataProvider {
      * @param days number of days of history
      */
     CoinGeckoMarketChartResponse fetchHistory(String providerId, int days);
+
+    List<com.abdulrafy.backend.market.dto.GlobalAssetResponse> searchGlobalAssets(String query);
 }

@@ -63,6 +63,7 @@ services:
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
       COINGECKO_BASE_URL: ${COINGECKO_BASE_URL:-https://api.coingecko.com/api/v3}
       COINGECKO_API_KEY: ${COINGECKO_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
     depends_on:
       postgres:

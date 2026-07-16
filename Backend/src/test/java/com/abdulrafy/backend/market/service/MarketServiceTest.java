@@ -52,7 +52,7 @@ class MarketServiceTest {
 
     @BeforeEach
     void setUp() {
-        marketService = new MarketService(assetRepository, marketDataProvider, redisTemplate);
+        marketService = new MarketService(assetRepository, marketDataProvider, redisTemplate, new tools.jackson.databind.ObjectMapper());
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 

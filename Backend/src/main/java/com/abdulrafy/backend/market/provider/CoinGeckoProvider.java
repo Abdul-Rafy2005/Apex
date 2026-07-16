@@ -111,4 +111,37 @@ public class CoinGeckoProvider implements MarketDataProvider {
             return new CoinGeckoMarketChartResponse(List.of(), List.of());
         }
     }
+    @Override
+    public List<com.abdulrafy.backend.market.dto.GlobalAssetResponse> searchGlobalAssets(String query) {
+        String url = UriComponentsBuilder.fromPath("/search")
+                .queryParam("query", query)
+                .build()
+                .toUriString();
+
+        try {
+            Map<String, Object> rawResponse = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .timeout(Duration.ofSeconds(10))
+                    .block();
+
+            if (rawResponse == null || !rawResponse.containsKey("coins")) {
+                return Collections.emptyList();
+            }
+
+            List<Map<String, Object>> coins = (List<Map<String, Object>>) rawResponse.get("coins");
+            return coins.stream()
+                    .map(c -> new com.abdulrafy.backend.market.dto.GlobalAssetResponse(
+                            (String) c.get("id"),
+                            (String) c.get("symbol"),
+                            (String) c.get("name"),
+                            (String) c.get("thumb")
+                    ))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Failed to search global assets from CoinGecko for query={}: {}", query, e.getMessage());
+            return Collections.emptyList();
+        }
+    }
 }

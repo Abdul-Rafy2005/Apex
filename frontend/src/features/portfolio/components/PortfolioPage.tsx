@@ -1,4 +1,7 @@
 import { usePortfolio, useTrades } from '../hooks/usePortfolioQuery';
+import { usePortfolioStream } from '../hooks/usePortfolioStream';
+import { useAssets } from '@/features/market/hooks/useMarket';
+import { usePriceStream } from '@/features/market/hooks/usePriceStream';
 import { Card } from '@/components/ui/Card';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
@@ -8,7 +11,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { PriceDisplay } from '@/components/shared/PriceDisplay';
 import { PercentageDisplay } from '@/components/shared/PercentageDisplay';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 function HoldingsTable() {
   const { data: portfolio, isLoading, error, refetch } = usePortfolio();
@@ -102,6 +105,7 @@ function HoldingsTable() {
 function TradeHistory() {
   const [page, setPage] = useState(0);
   const { data, isLoading, error, refetch } = useTrades(page, 15);
+  const { data: assets } = useAssets();
 
   if (isLoading) {
     return (
@@ -161,7 +165,7 @@ function TradeHistory() {
               <Td className="text-neutral-400 text-xs">
                 {new Date(t.executedAt).toLocaleDateString()}
               </Td>
-              <Td className="font-medium text-neutral-100">{t.assetId.slice(0, 8)}</Td>
+              <Td className="font-medium text-neutral-100">{assets?.find(a => a.id === t.assetId)?.symbol ?? t.assetId.slice(0, 8)}</Td>
               <Td>
                 <Badge variant={t.side === 'BUY' ? 'gain' : 'loss'}>
                   {t.side}
@@ -214,6 +218,13 @@ function TradeHistory() {
 
 export function PortfolioPage() {
   const { data: portfolio } = usePortfolio();
+
+  usePortfolioStream();
+  const symbols = useMemo(
+    () => portfolio?.holdings?.map((h) => h.symbol) ?? [],
+    [portfolio],
+  );
+  usePriceStream(symbols);
 
   return (
     <div className="space-y-6">

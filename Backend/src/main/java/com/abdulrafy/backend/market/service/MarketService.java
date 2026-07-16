@@ -29,13 +29,16 @@ public class MarketService {
     private final AssetRepository assetRepository;
     private final MarketDataProvider marketDataProvider;
     private final StringRedisTemplate redisTemplate;
+    private final tools.jackson.databind.ObjectMapper objectMapper;
 
     public MarketService(AssetRepository assetRepository,
                          MarketDataProvider marketDataProvider,
-                         StringRedisTemplate redisTemplate) {
+                         StringRedisTemplate redisTemplate,
+                         tools.jackson.databind.ObjectMapper objectMapper) {
         this.assetRepository = assetRepository;
         this.marketDataProvider = marketDataProvider;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public List<AssetResponse> listAssets() {
@@ -142,10 +145,69 @@ public class MarketService {
     }
 
     public List<HistoricalPriceResponse> getHistory(String symbol, int days) {
+        String cacheKey = "market:history:" + symbol + ":" + days;
+        try {
+            String cached = redisTemplate.opsForValue().get(cacheKey);
+            if (cached != null) {
+                return List.of(objectMapper.readValue(cached, HistoricalPriceResponse[].class));
+            }
+        } catch (Exception e) {
+            log.warn("Cache read failed for history", e);
+        }
+
         Asset asset = assetRepository.findBySymbol(symbol)
-                .orElseThrow(() -> new NotFoundException("Asset not found: " + symbol));
+                .orElseThrow(() -> new com.abdulrafy.backend.common.exception.NotFoundException("Asset not found: " + symbol));
 
         CoinGeckoMarketChartResponse chart = marketDataProvider.fetchHistory(asset.getProviderSource(), days);
-        return MarketMapper.toHistoricalPrices(chart.prices(), chart.volumes());
+        List<HistoricalPriceResponse> result = MarketMapper.toHistoricalPrices(chart.prices(), chart.volumes());
+
+        if (!result.isEmpty()) {
+            try {
+                redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(result), Duration.ofHours(24));
+            } catch (Exception e) {
+                log.warn("Cache write failed for history", e);
+            }
+        }
+        return result;
+    }
+    public List<com.abdulrafy.backend.market.dto.GlobalAssetResponse> searchGlobalAssets(String query) {
+        return marketDataProvider.searchGlobalAssets(query);
+    }
+
+    public AssetResponse addAsset(com.abdulrafy.backend.market.dto.AddAssetRequest request) {
+        if (assetRepository.findBySymbol(request.symbol().toUpperCase()).isPresent()) {
+            throw new com.abdulrafy.backend.common.exception.ApexException("ASSET_EXISTS", "Asset already exists", 409);
+        }
+
+        Asset asset = Asset.builder()
+                .symbol(request.symbol().toUpperCase())
+                .name(request.name())
+                .providerSource(request.providerSource())
+                .precision(8)
+                .tradable(true)
+                .build();
+        asset = assetRepository.save(asset);
+
+        // Fetch live price immediately to populate cache
+        try {
+            java.util.Map<String, LivePriceResponse> prices = marketDataProvider.fetchPrices(List.of(asset.getProviderSource()));
+            LivePriceResponse price = prices.get(asset.getProviderSource());
+            if (price != null) {
+                redisTemplate.opsForValue().set(
+                        PRICE_CACHE_PREFIX + asset.getSymbol(),
+                        price.priceUsd().toPlainString(),
+                        PRICE_CACHE_TTL
+                );
+                redisTemplate.opsForValue().set(
+                        CHANGE_CACHE_PREFIX + asset.getSymbol(),
+                        price.change24hPct().toPlainString(),
+                        PRICE_CACHE_TTL
+                );
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch initial price for new asset {}", asset.getSymbol(), e);
+        }
+
+        return AssetMapper.toResponse(asset);
     }
 }

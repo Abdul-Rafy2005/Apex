@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { useTrades } from '@/features/portfolio/hooks/usePortfolioQuery';
+import { useAssets } from '@/features/market/hooks/useMarket';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -12,6 +13,7 @@ function formatTime(iso: string) {
 
 export function RecentTradesTable() {
   const { data, isLoading } = useTrades(0, 5);
+  const { data: assets } = useAssets();
 
   if (isLoading) {
     return (
@@ -67,7 +69,7 @@ export function RecentTradesTable() {
                   {t.side}
                 </Badge>
               </Td>
-              <Td className="font-medium">{t.assetId.slice(0, 6)}</Td>
+              <Td className="font-medium">{assets?.find(a => a.id === t.assetId)?.symbol ?? t.assetId.slice(0, 6)}</Td>
               <Td className="text-right tabular-nums">{Number(t.quantity).toFixed(4)}</Td>
               <Td className="text-right tabular-nums">${Number(t.price).toFixed(2)}</Td>
               <Td className="text-right text-neutral-500">{formatTime(t.executedAt)}</Td>

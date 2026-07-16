@@ -19,4 +19,15 @@ export const marketApi = {
     apiFetch<HistoricalPriceResponse[]>(
       `/api/v1/market/${encodeURIComponent(symbol)}/history?days=${days}`,
     ),
+
+  searchGlobalAssets: (query: string) =>
+    apiFetch<{ id: string; symbol: string; name: string; thumb: string }[]>(
+      `/api/v1/market/search?query=${encodeURIComponent(query)}`,
+    ),
+
+  addAsset: (payload: { symbol: string; name: string; providerSource: string }) =>
+    apiFetch<AssetResponse>('/api/v1/market/assets', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };

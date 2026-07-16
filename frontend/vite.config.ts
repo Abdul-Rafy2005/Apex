@@ -17,4 +17,7 @@ export default defineConfig({
     setupFiles: './src/test/setup.ts',
     css: true,
   },
+  define: {
+    global: 'globalThis',
+  },
 })

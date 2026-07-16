@@ -155,13 +155,12 @@ public class JournalService {
         Map<String, BigDecimal> allocation = Map.of();
         if (snapshot.getAllocationBreakdown() != null && !snapshot.getAllocationBreakdown().isEmpty()) {
             try {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> raw = new tools.jackson.databind.ObjectMapper()
-                        .readValue(snapshot.getAllocationBreakdown(), Map.class);
-                allocation = raw.entrySet().stream()
+                com.abdulrafy.backend.analytics.dto.AllocationEntry[] entries = new tools.jackson.databind.ObjectMapper()
+                        .readValue(snapshot.getAllocationBreakdown(), com.abdulrafy.backend.analytics.dto.AllocationEntry[].class);
+                allocation = java.util.Arrays.stream(entries)
                         .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                e -> new BigDecimal(e.getValue().toString())
+                                com.abdulrafy.backend.analytics.dto.AllocationEntry::symbol,
+                                com.abdulrafy.backend.analytics.dto.AllocationEntry::pct
                         ));
             } catch (Exception e) {
                 log.warn("Failed to parse allocation breakdown: {}", e.getMessage());

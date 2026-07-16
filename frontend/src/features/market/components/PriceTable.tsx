@@ -5,8 +5,10 @@ import { PriceDisplay } from '@/components/shared/PriceDisplay';
 import { PercentageDisplay } from '@/components/shared/PercentageDisplay';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { Button } from '@/components/ui/Button';
 import { useAssets, useAssetPrices } from '../hooks/useMarket';
 import { usePriceStream } from '../hooks/usePriceStream';
+import { AddAssetModal } from './AddAssetModal';
 
 type SortKey = 'symbol' | 'priceUsd' | 'change24hPct';
 type SortDir = 'asc' | 'desc';
@@ -20,6 +22,7 @@ export function PriceTable({ onAssetSelect, selectedSymbol }: PriceTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('symbol');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [search, setSearch] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const { data: assets, isLoading: assetsLoading } = useAssets();
   const symbols = useMemo(() => assets?.map((a) => a.symbol) ?? [], [assets]);
@@ -92,7 +95,7 @@ export function PriceTable({ onAssetSelect, selectedSymbol }: PriceTableProps) {
 
   return (
     <Card padding="none">
-      <div className="p-4 border-b border-neutral-800">
+      <div className="p-4 border-b border-neutral-800 flex justify-between items-center gap-4">
         <input
           type="text"
           placeholder="Search assets..."
@@ -100,6 +103,9 @@ export function PriceTable({ onAssetSelect, selectedSymbol }: PriceTableProps) {
           onChange={(e) => setSearch(e.target.value)}
           className="h-8 px-3 text-sm rounded-md bg-neutral-900 border border-neutral-700 text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent w-full max-w-sm"
         />
+        <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
+          Add Coin
+        </Button>
       </div>
       <Table>
         <Thead>
@@ -143,6 +149,7 @@ export function PriceTable({ onAssetSelect, selectedSymbol }: PriceTableProps) {
           )}
         </Tbody>
       </Table>
+      <AddAssetModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
     </Card>
   );
 }
