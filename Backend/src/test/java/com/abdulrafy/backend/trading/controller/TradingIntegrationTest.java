@@ -358,16 +358,19 @@ class TradingIntegrationTest extends IntegrationTestBase {
         doneLatch.await(10, TimeUnit.SECONDS);
         executor.shutdown();
 
-        // 1. Exactly one succeeded (201) and exactly one failed (409)
+        // 1. Exactly one succeeded (201) and the other was rejected.
+        // The rejection can be either 409 (optimistic lock conflict, if both
+        // threads raced on the same stale version) or 400 (insufficient funds,
+        // if one thread committed first and the other saw the reduced balance).
         assertThat(results).hasSize(2);
         long successCount = results.stream()
                 .filter(r -> r.getResponse().getStatus() == 201)
                 .count();
-        long conflictCount = results.stream()
-                .filter(r -> r.getResponse().getStatus() == 409)
+        long rejectedCount = results.stream()
+                .filter(r -> r.getResponse().getStatus() == 409 || r.getResponse().getStatus() == 400)
                 .count();
         assertThat(successCount).isEqualTo(1);
-        assertThat(conflictCount).isEqualTo(1);
+        assertThat(rejectedCount).isEqualTo(1);
 
         // 2. Final cash balance is exactly 57958 - 42042 = 15916
         MvcResult portfolioResult = mockMvc.perform(get("/api/v1/trading/portfolio")

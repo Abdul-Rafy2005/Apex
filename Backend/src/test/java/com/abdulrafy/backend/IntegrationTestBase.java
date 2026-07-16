@@ -8,6 +8,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.time.Duration;
+
 @ActiveProfiles("test")
 public abstract class IntegrationTestBase {
 
@@ -27,7 +29,8 @@ public abstract class IntegrationTestBase {
         redis.start();
 
         rabbitmq = new RabbitMQContainer("rabbitmq:3-management")
-                .withExposedPorts(5672, 15672);
+                .withExposedPorts(5672, 15672)
+                .withStartupTimeout(Duration.ofSeconds(120));
         rabbitmq.start();
     }
 
