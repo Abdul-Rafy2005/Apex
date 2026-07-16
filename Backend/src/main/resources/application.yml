@@ -58,6 +58,11 @@ apex:
       api-key: ${COINGECKO_API_KEY:}
     ingestion:
       interval-ms: 60000
+  journal:
+    provider: ${JOURNAL_PROVIDER:gemini}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
 
 server:
   port: 8080
