@@ -58,25 +58,25 @@ describe('OrgDashboardPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
     vi.mocked(orgHooks.useOrgMembers).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrgMembers>);
+    } as unknown as ReturnType<typeof orgHooks.useOrgMembers>);
     vi.mocked(orgHooks.useLeaderboard).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useLeaderboard>);
+    } as unknown as ReturnType<typeof orgHooks.useLeaderboard>);
     vi.mocked(orgHooks.useAuditLog).mockReturnValue({
       data: { content: [], totalElements: 0, totalPages: 0, number: 0 },
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useAuditLog>);
+    } as unknown as ReturnType<typeof orgHooks.useAuditLog>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
@@ -98,25 +98,25 @@ describe('OrgDashboardPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
     vi.mocked(orgHooks.useOrgMembers).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrgMembers>);
+    } as unknown as ReturnType<typeof orgHooks.useOrgMembers>);
     vi.mocked(orgHooks.useLeaderboard).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useLeaderboard>);
+    } as unknown as ReturnType<typeof orgHooks.useLeaderboard>);
     vi.mocked(orgHooks.useAuditLog).mockReturnValue({
       data: { content: [], totalElements: 0, totalPages: 0, number: 0 },
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useAuditLog>);
+    } as unknown as ReturnType<typeof orgHooks.useAuditLog>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
@@ -137,25 +137,25 @@ describe('OrgDashboardPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
     vi.mocked(orgHooks.useOrgMembers).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrgMembers>);
+    } as unknown as ReturnType<typeof orgHooks.useOrgMembers>);
     vi.mocked(orgHooks.useLeaderboard).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useLeaderboard>);
+    } as unknown as ReturnType<typeof orgHooks.useLeaderboard>);
     vi.mocked(orgHooks.useAuditLog).mockReturnValue({
       data: { content: [], totalElements: 0, totalPages: 0, number: 0 },
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useAuditLog>);
+    } as unknown as ReturnType<typeof orgHooks.useAuditLog>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
@@ -177,25 +177,25 @@ describe('OrgDashboardPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
     vi.mocked(orgHooks.useOrgMembers).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrgMembers>);
+    } as unknown as ReturnType<typeof orgHooks.useOrgMembers>);
     vi.mocked(orgHooks.useLeaderboard).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useLeaderboard>);
+    } as unknown as ReturnType<typeof orgHooks.useLeaderboard>);
     vi.mocked(orgHooks.useAuditLog).mockReturnValue({
       data: { content: [], totalElements: 0, totalPages: 0, number: 0 },
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useAuditLog>);
+    } as unknown as ReturnType<typeof orgHooks.useAuditLog>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
@@ -218,25 +218,25 @@ describe('OrgDashboardPage', () => {
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
     vi.mocked(orgHooks.useOrgMembers).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrgMembers>);
+    } as unknown as ReturnType<typeof orgHooks.useOrgMembers>);
     vi.mocked(orgHooks.useLeaderboard).mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useLeaderboard>);
+    } as unknown as ReturnType<typeof orgHooks.useLeaderboard>);
     vi.mocked(orgHooks.useAuditLog).mockReturnValue({
       data: { content: [], totalElements: 0, totalPages: 0, number: 0 },
       isLoading: false,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useAuditLog>);
+    } as unknown as ReturnType<typeof orgHooks.useAuditLog>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
@@ -249,7 +249,7 @@ describe('OrgDashboardPage', () => {
       isLoading: true,
       isError: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof orgHooks.useOrganization>);
+    } as unknown as ReturnType<typeof orgHooks.useOrganization>);
 
     renderWithProviders(createElement(OrgDashboardPage));
 
