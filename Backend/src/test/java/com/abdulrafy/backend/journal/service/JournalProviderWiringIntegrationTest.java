@@ -1,5 +1,6 @@
 package com.abdulrafy.backend.journal.service;
 
+import com.abdulrafy.backend.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "gemini.api-key=test-key",
         "anthropic.api-key=test-key"
 })
-class JournalProviderWiringIntegrationTest {
+class JournalProviderWiringIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private AiJournalGenerator journalGenerator;
