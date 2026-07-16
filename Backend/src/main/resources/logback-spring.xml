@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>{
+                "timestamp":"%date{ISO8601}",
+                "level":"%level",
+                "logger":"%logger{36}",
+                "message":"%msg",
+                "correlationId":"%X{correlationId:-}",
+                "requestId":"%X{requestId:-}",
+                "thread":"%thread",
+                "stackTrace":"%rEx{short}"
+            }</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/apex-backend.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/apex-backend.%d{yyyy-MM-dd}.json</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>{
+                "timestamp":"%date{ISO8601}",
+                "level":"%level",
+                "logger":"%logger{36}",
+                "message":"%msg",
+                "correlationId":"%X{correlationId:-}",
+                "requestId":"%X{requestId:-}",
+                "thread":"%thread",
+                "stackTrace":"%rEx{short}"
+            }</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.abdulrafy.backend" level="INFO"/>
+    <logger name="org.springframework.security" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE"/>
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+</configuration>

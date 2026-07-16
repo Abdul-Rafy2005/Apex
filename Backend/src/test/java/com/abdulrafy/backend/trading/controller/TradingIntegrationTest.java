@@ -243,7 +243,7 @@ class TradingIntegrationTest extends IntegrationTestBase {
                 .header("Idempotency-Key", "idem-noasset")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -264,6 +264,49 @@ class TradingIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
                 .andExpect(jsonPath("$.content[0].side").value("BUY"));
+    }
+
+    @Test
+    void executeTrade_failedThenSameKeySucceeds_producesTwoTrades() throws Exception {
+        // Attempt 1: BUY 3 BTC with key "idem-fail-ok" → insufficient funds
+        // 3 * 42000 = 126000 > 100000. Trade validation fails, no record saved.
+        ExecuteTradeRequest failReq = new ExecuteTradeRequest(
+                btcAsset.getId(), OrderSide.BUY, new BigDecimal("3"), "idem-fail-ok");
+
+        mockMvc.perform(post("/api/v1/trading/execute")
+                .header("Authorization", "Bearer " + authResponse.accessToken())
+                .header("Idempotency-Key", "idem-fail-ok")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(failReq)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value(containsString("Insufficient funds")));
+
+        assertThat(tradeRepository.count()).isEqualTo(0);
+
+        // Attempt 2: BUY 1 BTC with same key "idem-fail-ok" → should succeed
+        // No idempotency record exists (first trade failed before save), so key is not reused.
+        ExecuteTradeRequest okReq = new ExecuteTradeRequest(
+                btcAsset.getId(), OrderSide.BUY, new BigDecimal("1"), "idem-fail-ok");
+
+        mockMvc.perform(post("/api/v1/trading/execute")
+                .header("Authorization", "Bearer " + authResponse.accessToken())
+                .header("Idempotency-Key", "idem-fail-ok")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(okReq)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.side").value("BUY"))
+                .andExpect(jsonPath("$.quantity").value(1));
+
+        // Exactly 1 trade exists (the successful one)
+        assertThat(tradeRepository.count()).isEqualTo(1);
+
+        // Portfolio has 1 BTC, cash = 100000 - 42042 = 57958
+        mockMvc.perform(get("/api/v1/trading/portfolio")
+                .header("Authorization", "Bearer " + authResponse.accessToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cashBalance").value(57958))
+                .andExpect(jsonPath("$.holdings.length()").value(1))
+                .andExpect(jsonPath("$.holdings[0].quantity").value(1));
     }
 
     @Test

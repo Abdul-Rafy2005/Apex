@@ -6,10 +6,12 @@ import com.abdulrafy.backend.auth.repository.PortfolioRepository;
 import com.abdulrafy.backend.common.exception.ApexException;
 import com.abdulrafy.backend.journal.entity.TradeJournalEntry;
 import com.abdulrafy.backend.journal.repository.TradeJournalEntryRepository;
+import com.abdulrafy.backend.notification.event.JournalGeneratedEvent;
 import com.abdulrafy.backend.trading.entity.Trade;
 import com.abdulrafy.backend.trading.repository.TradeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,6 +42,7 @@ public class JournalService {
     private final TradeRepository tradeRepository;
     private final PortfolioRepository portfolioRepository;
     private final AiJournalGenerator journalGenerator;
+    private final RabbitTemplate rabbitTemplate;
 
     @Transactional(readOnly = true)
     public Page<TradeJournalEntry> getJournalEntries(UUID userId, Pageable pageable) {
@@ -68,12 +71,7 @@ public class JournalService {
                 .orElseThrow(() -> new ApexException("PORTFOLIO_NOT_FOUND", "Portfolio not found", 404))
                 .getId();
 
-        // Get today's snapshot
-        PerformanceSnapshot snapshot = snapshotRepository
-                .findByPortfolioIdAndSnapshotDate(portfolioId, today)
-                .orElseThrow(() -> new ApexException("NO_SNAPSHOT", "No analytics snapshot available for today", 404));
-
-        // Get today's trades for the user's portfolio
+        // Get today's trades for the user's portfolio — validate count before snapshot
         List<Trade> todayTrades = tradeRepository.findByPortfolioIdOrderByExecutedAtAsc(portfolioId);
         List<Trade> tradesToday = todayTrades.stream()
                 .filter(t -> t.getExecutedAt().atZone(UTC).toLocalDate().equals(today))
@@ -82,6 +80,11 @@ public class JournalService {
         if (tradesToday.size() < MIN_TRADES_FOR_JOURNAL) {
             throw new ApexException("INSUFFICIENT_TRADES", "At least " + MIN_TRADES_FOR_JOURNAL + " trade(s) required to generate a journal entry", 400);
         }
+
+        // Get today's snapshot
+        PerformanceSnapshot snapshot = snapshotRepository
+                .findByPortfolioIdAndSnapshotDate(portfolioId, today)
+                .orElseThrow(() -> new ApexException("NO_SNAPSHOT", "No analytics snapshot available for today", 404));
 
         // Build metrics payload
         AiJournalGenerator.JournalMetrics metrics = buildMetrics(snapshot);
@@ -100,6 +103,9 @@ public class JournalService {
 
         TradeJournalEntry saved = journalRepository.save(entry);
         log.info("Journal entry generated for user {} on {}", userId, today);
+
+        publishJournalEvent(userId, saved.getId(), today.toString());
+
         return saved;
     }
 
@@ -137,6 +143,7 @@ public class JournalService {
 
                 journalRepository.save(entry);
                 log.info("Daily journal generated for user {} on {}", userId, yesterday);
+                publishJournalEvent(userId, entry.getId(), yesterday.toString());
             } catch (Exception e) {
                 log.error("Failed to generate daily journal for user {}: {}", userId, e.getMessage());
             }
@@ -179,5 +186,15 @@ public class JournalService {
                 snapshot.getUnrealizedPnl(),
                 allocation
         );
+    }
+
+    private void publishJournalEvent(UUID userId, UUID journalEntryId, String entryDate) {
+        try {
+            rabbitTemplate.convertAndSend(
+                    "journal.exchange", "journal.generated",
+                    new JournalGeneratedEvent(userId, journalEntryId, entryDate));
+        } catch (Exception e) {
+            log.error("Failed to publish journal event for user {}: {}", userId, e.getMessage());
+        }
     }
 }

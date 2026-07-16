@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, it, expect } from 'vitest'
-import App from './App'
+import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { describe, it, expect } from 'vitest';
+import App from './App';
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -10,26 +10,25 @@ const createTestQueryClient = () =>
         retry: false,
       },
     },
-  })
+  });
 
 describe('App', () => {
-  it('renders without crashing', () => {
-    const queryClient = createTestQueryClient()
+  it('renders the Apex brand name', () => {
     render(
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={createTestQueryClient()}>
         <App />
       </QueryClientProvider>,
-    )
-    expect(screen.getByText('Apex')).toBeInTheDocument()
-  })
+    );
+    expect(screen.getAllByText('Apex').length).toBeGreaterThan(0);
+  });
 
-  it('displays the tagline', () => {
-    const queryClient = createTestQueryClient()
+  it('renders the login form on the auth route', () => {
+    window.history.pushState({}, '', '/auth');
     render(
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={createTestQueryClient()}>
         <App />
       </QueryClientProvider>,
-    )
-    expect(screen.getByText('Market Simulation & Portfolio Intelligence')).toBeInTheDocument()
-  })
-})
+    );
+    expect(screen.getByText('Sign in to your account')).toBeInTheDocument();
+  });
+});

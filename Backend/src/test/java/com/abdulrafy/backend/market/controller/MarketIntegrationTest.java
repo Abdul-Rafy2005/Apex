@@ -6,6 +6,9 @@ import com.abdulrafy.backend.market.dto.LivePriceResponse;
 import com.abdulrafy.backend.market.entity.Asset;
 import com.abdulrafy.backend.market.provider.MarketDataProvider;
 import com.abdulrafy.backend.market.repository.AssetRepository;
+import com.abdulrafy.backend.trading.repository.HoldingRepository;
+import com.abdulrafy.backend.trading.repository.TradeRepository;
+import com.abdulrafy.backend.trading.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,15 @@ class MarketIntegrationTest extends IntegrationTestBase {
     private AssetRepository assetRepository;
 
     @Autowired
+    private TradeRepository tradeRepository;
+
+    @Autowired
+    private HoldingRepository holdingRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @MockitoBean
@@ -48,6 +60,9 @@ class MarketIntegrationTest extends IntegrationTestBase {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        tradeRepository.deleteAllInBatch();
+        orderRepository.deleteAllInBatch();
+        holdingRepository.deleteAllInBatch();
         assetRepository.deleteAllInBatch();
         redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
             connection.serverCommands().flushDb();

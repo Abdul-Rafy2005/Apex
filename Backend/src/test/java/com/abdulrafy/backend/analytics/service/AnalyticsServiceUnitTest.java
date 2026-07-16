@@ -7,10 +7,13 @@ import com.abdulrafy.backend.analytics.repository.PerformanceSnapshotRepository;
 import com.abdulrafy.backend.auth.entity.Portfolio;
 import com.abdulrafy.backend.auth.entity.User;
 import com.abdulrafy.backend.auth.repository.PortfolioRepository;
+import com.abdulrafy.backend.auth.repository.UserRepository;
+import com.abdulrafy.backend.leaderboard.service.LeaderboardService;
 import com.abdulrafy.backend.market.dto.LivePriceResponse;
 import com.abdulrafy.backend.market.entity.Asset;
 import com.abdulrafy.backend.market.repository.AssetRepository;
 import com.abdulrafy.backend.market.service.MarketService;
+import com.abdulrafy.backend.organization.repository.MembershipRepository;
 import com.abdulrafy.backend.trading.entity.Holding;
 import com.abdulrafy.backend.trading.entity.OrderSide;
 import com.abdulrafy.backend.trading.entity.Trade;
@@ -44,6 +47,9 @@ class AnalyticsServiceUnitTest {
     @Mock private MarketService marketService;
     @Mock private StringRedisTemplate redisTemplate;
     @Mock private ValueOperations<String, String> valueOperations;
+    @Mock private LeaderboardService leaderboardService;
+    @Mock private MembershipRepository membershipRepository;
+    @Mock private UserRepository userRepository;
 
     private AnalyticsService analyticsService;
 
@@ -56,7 +62,8 @@ class AnalyticsServiceUnitTest {
     void setUp() {
         analyticsService = new AnalyticsService(
                 snapshotRepository, tradeRepository, holdingRepository,
-                portfolioRepository, assetRepository, marketService, redisTemplate);
+                portfolioRepository, assetRepository, marketService, redisTemplate,
+                leaderboardService, membershipRepository, userRepository);
     }
 
     private Portfolio portfolio(BigDecimal cash) {

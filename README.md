@@ -55,19 +55,6 @@ cd Backend
 ./mvnw verify            # unit + integration tests (requires Docker for Testcontainers)
 ```
 
-#### Windows developers: Testcontainers setup
-
-Docker Desktop on Windows exposes a named pipe that Testcontainers cannot connect to reliably.
-You must expose the Docker daemon over TCP for integration tests:
-
-1. Docker Desktop → Settings → General → enable **"Expose daemon on tcp://localhost:2375 without TLS"** → Apply & Restart.
-2. Set the environment variable system-wide (one-time):
-   ```
-   setx DOCKER_HOST tcp://localhost:2375
-   ```
-3. Open a **new** terminal (setx does not affect already-open shells), then run `.\mvnw verify`.
-
-This is a local dev workaround only. CI runs on Linux with standard Docker socket access — no changes needed there.
 
 ### Frontend
 

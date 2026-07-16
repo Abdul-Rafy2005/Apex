@@ -1,4 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createElement } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { usePriceStream } from '@/features/market/hooks/usePriceStream';
 import { usePortfolioStream } from '@/features/portfolio/hooks/usePortfolioStream';
@@ -16,6 +18,24 @@ vi.mock('@/lib/websocket', () => ({
   isConnected: () => false,
 }));
 
+function createTestQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+}
+
+function renderWithQueryClient(hook: () => void) {
+  const queryClient = createTestQueryClient();
+  const wrapper = ({ children }: { children: React.ReactNode }) =>
+    createElement(QueryClientProvider, { client: queryClient }, children);
+  return {
+    ...renderHook(hook, { wrapper }),
+    queryClient,
+  };
+}
+
 describe('usePriceStream', () => {
   beforeEach(() => {
     mockSubscribe.mockClear();
@@ -23,21 +43,23 @@ describe('usePriceStream', () => {
   });
 
   it('subscribes to price topics for each symbol', () => {
-    renderHook(() => usePriceStream(['BTC', 'ETH']));
+    renderWithQueryClient(() => usePriceStream(['BTC', 'ETH']));
 
     expect(mockSubscribe).toHaveBeenCalledTimes(2);
     expect(mockSubscribe).toHaveBeenCalledWith('/topic/prices/BTC', expect.any(Function));
     expect(mockSubscribe).toHaveBeenCalledWith('/topic/prices/ETH', expect.any(Function));
   });
 
-  it('updates prices when a message arrives', () => {
+  it('feeds price updates into query cache', () => {
     let priceCallback: ((body: string) => void) | undefined;
     mockSubscribe.mockImplementation((_dest: string, cb: (body: string) => void) => {
       priceCallback = cb;
       return { unsubscribe: vi.fn() };
     });
 
-    const { result } = renderHook(() => usePriceStream(['BTC']));
+    const { queryClient } = renderWithQueryClient(() => usePriceStream(['BTC']));
+
+    const setQueryDataSpy = vi.spyOn(queryClient, 'setQueryData');
 
     act(() => {
       priceCallback!(
@@ -50,12 +72,10 @@ describe('usePriceStream', () => {
       );
     });
 
-    expect(result.current.BTC).toEqual({
-      symbol: 'BTC',
-      priceUsd: 45000,
-      change24hPct: 2.5,
-      timestamp: '2026-07-14T12:00:00Z',
-    });
+    expect(setQueryDataSpy).toHaveBeenCalledWith(
+      ['market', 'prices', ['BTC']],
+      expect.any(Function),
+    );
   });
 
   it('ignores malformed messages without crashing', () => {
@@ -65,17 +85,17 @@ describe('usePriceStream', () => {
       return { unsubscribe: vi.fn() };
     });
 
-    const { result } = renderHook(() => usePriceStream(['BTC']));
+    renderWithQueryClient(() => usePriceStream(['BTC']));
 
     act(() => {
       priceCallback!('not json');
     });
 
-    expect(result.current).toEqual({});
+    // Should not throw
   });
 
   it('unsubscribes on unmount', () => {
-    const { unmount } = renderHook(() => usePriceStream(['BTC']));
+    const { unmount } = renderWithQueryClient(() => usePriceStream(['BTC']));
     unmount();
 
     expect(mockUnsubscribe).toHaveBeenCalledWith('/topic/prices/BTC');
@@ -89,20 +109,22 @@ describe('usePortfolioStream', () => {
   });
 
   it('subscribes to portfolio queue', () => {
-    renderHook(() => usePortfolioStream());
+    renderWithQueryClient(() => usePortfolioStream());
 
     expect(mockSubscribe).toHaveBeenCalledTimes(1);
     expect(mockSubscribe).toHaveBeenCalledWith('/user/queue/portfolio', expect.any(Function));
   });
 
-  it('prepends new events when messages arrive', () => {
+  it('invalidates queries when a trade event arrives', () => {
     let eventCallback: ((body: string) => void) | undefined;
     mockSubscribe.mockImplementation((_dest: string, cb: (body: string) => void) => {
       eventCallback = cb;
       return { unsubscribe: vi.fn() };
     });
 
-    const { result } = renderHook(() => usePortfolioStream());
+    const { queryClient } = renderWithQueryClient(() => usePortfolioStream());
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     act(() => {
       eventCallback!(
@@ -119,9 +141,9 @@ describe('usePortfolioStream', () => {
       );
     });
 
-    expect(result.current).toHaveLength(1);
-    expect(result.current[0].side).toBe('BUY');
-    expect(result.current[0].price).toBe(42000);
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['portfolio'] });
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['trades'] });
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['analytics', 'summary'] });
   });
 
   it('ignores malformed messages without crashing', () => {
@@ -131,17 +153,17 @@ describe('usePortfolioStream', () => {
       return { unsubscribe: vi.fn() };
     });
 
-    const { result } = renderHook(() => usePortfolioStream());
+    renderWithQueryClient(() => usePortfolioStream());
 
     act(() => {
       eventCallback!('invalid json');
     });
 
-    expect(result.current).toEqual([]);
+    // Should not throw
   });
 
   it('unsubscribes on unmount', () => {
-    const { unmount } = renderHook(() => usePortfolioStream());
+    const { unmount } = renderWithQueryClient(() => usePortfolioStream());
     unmount();
 
     expect(mockUnsubscribe).toHaveBeenCalledWith('/user/queue/portfolio');

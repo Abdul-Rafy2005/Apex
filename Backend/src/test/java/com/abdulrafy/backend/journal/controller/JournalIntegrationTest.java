@@ -15,11 +15,13 @@ import com.abdulrafy.backend.market.entity.Asset;
 import com.abdulrafy.backend.market.repository.AssetRepository;
 import com.abdulrafy.backend.trading.entity.OrderSide;
 import com.abdulrafy.backend.trading.entity.Trade;
+import com.abdulrafy.backend.trading.repository.HoldingRepository;
 import com.abdulrafy.backend.trading.repository.TradeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -55,8 +57,10 @@ class JournalIntegrationTest extends IntegrationTestBase {
     @Autowired private PortfolioRepository portfolioRepository;
     @Autowired private AssetRepository assetRepository;
     @Autowired private TradeRepository tradeRepository;
+    @Autowired private HoldingRepository holdingRepository;
     @Autowired private PerformanceSnapshotRepository snapshotRepository;
     @Autowired private TradeJournalEntryRepository journalRepository;
+    @Autowired private StringRedisTemplate redisTemplate;
     @Autowired private ObjectMapper objectMapper;
 
     @MockitoBean private AiJournalGenerator journalGenerator;
@@ -73,7 +77,17 @@ class JournalIntegrationTest extends IntegrationTestBase {
                 .apply(springSecurity())
                 .build();
 
+        journalRepository.deleteAllInBatch();
+        tradeRepository.deleteAllInBatch();
+        snapshotRepository.deleteAllInBatch();
+        holdingRepository.deleteAllInBatch();
         assetRepository.deleteAllInBatch();
+
+        redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<Object>) connection -> {
+            connection.serverCommands().flushDb();
+            return null;
+        });
+
         btcAsset = Asset.builder()
                 .symbol("BTC").name("Bitcoin").precision(8)
                 .providerSource("manual").tradable(true).build();
@@ -242,6 +256,6 @@ class JournalIntegrationTest extends IntegrationTestBase {
     void generateJournal_unauthenticated_rejected() throws Exception {
         mockMvc.perform(post("/api/v1/journal/generate")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

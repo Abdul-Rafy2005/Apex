@@ -9,6 +9,7 @@ import com.abdulrafy.backend.common.exception.ApexException;
 import com.abdulrafy.backend.journal.entity.TradeJournalEntry;
 import com.abdulrafy.backend.journal.repository.TradeJournalEntryRepository;
 import com.abdulrafy.backend.trading.entity.Trade;
+import com.abdulrafy.backend.trading.entity.OrderSide;
 import com.abdulrafy.backend.trading.repository.TradeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -43,6 +45,9 @@ class JournalServiceUnitTest {
 
     @Mock
     private PortfolioRepository portfolioRepository;
+
+    @Mock
+    private org.springframework.amqp.rabbit.core.RabbitTemplate rabbitTemplate;
 
     @InjectMocks
     private JournalService journalService;
@@ -108,7 +113,8 @@ class JournalServiceUnitTest {
 
         fakeGenerator = new FakeJournalGenerator();
         journalService = new JournalService(
-                journalRepository, snapshotRepository, tradeRepository, portfolioRepository, fakeGenerator);
+                journalRepository, snapshotRepository, tradeRepository, portfolioRepository,
+                fakeGenerator, rabbitTemplate);
     }
 
     @Test
@@ -134,6 +140,13 @@ class JournalServiceUnitTest {
         when(journalRepository.findByUserIdAndEntryDate(userId, LocalDate.now(ZoneId.of("UTC"))))
                 .thenReturn(Optional.empty());
         when(portfolioRepository.findByUserId(userId)).thenReturn(Optional.of(portfolio));
+        when(tradeRepository.findByPortfolioIdOrderByExecutedAtAsc(portfolioId))
+                .thenReturn(java.util.List.of(
+                        Trade.builder().id(UUID.randomUUID()).portfolioId(portfolioId)
+                                .assetId(UUID.randomUUID())                                .side(OrderSide.BUY)
+                                .quantity(new BigDecimal("1")).price(new BigDecimal("42000"))
+                                .fee(new BigDecimal("1")).executedAt(Instant.now())
+                                .idempotencyKey("idem-snap-test").build()));
         when(snapshotRepository.findByPortfolioIdAndSnapshotDate(portfolioId, LocalDate.now(ZoneId.of("UTC"))))
                 .thenReturn(Optional.empty());
 
@@ -147,8 +160,6 @@ class JournalServiceUnitTest {
         when(journalRepository.findByUserIdAndEntryDate(userId, LocalDate.now(ZoneId.of("UTC"))))
                 .thenReturn(Optional.empty());
         when(portfolioRepository.findByUserId(userId)).thenReturn(Optional.of(portfolio));
-        when(snapshotRepository.findByPortfolioIdAndSnapshotDate(portfolioId, LocalDate.now(ZoneId.of("UTC"))))
-                .thenReturn(Optional.of(snapshot));
         when(tradeRepository.findByPortfolioIdOrderByExecutedAtAsc(portfolioId))
                 .thenReturn(java.util.List.of()); // No trades
 

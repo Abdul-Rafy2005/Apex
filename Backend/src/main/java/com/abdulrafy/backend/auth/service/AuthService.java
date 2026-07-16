@@ -41,8 +41,10 @@ public class AuthService {
         this.seedBalance = seedBalance;
     }
 
+    public record TokenPair(String accessToken, String refreshToken, UserResponse user) {}
+
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public TokenPair register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new ConflictException("Email already registered");
         }
@@ -61,11 +63,11 @@ public class AuthService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        return buildAuthResponse(user);
+        return buildTokenPair(user);
     }
 
     @Transactional(readOnly = true)
-    public AuthResponse login(LoginRequest request) {
+    public TokenPair login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
@@ -73,20 +75,20 @@ public class AuthService {
             throw new UnauthorizedException("Invalid credentials");
         }
 
-        return buildAuthResponse(user);
+        return buildTokenPair(user);
     }
 
     @Transactional(readOnly = true)
-    public AuthResponse refresh(RefreshTokenRequest request) {
-        if (!jwtService.isTokenValid(request.refreshToken())) {
+    public TokenPair refresh(String refreshToken) {
+        if (!jwtService.isTokenValid(refreshToken)) {
             throw new UnauthorizedException("Invalid refresh token");
         }
 
-        UUID userId = jwtService.extractUserId(request.refreshToken());
+        UUID userId = jwtService.extractUserId(refreshToken);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
 
-        return buildAuthResponse(user);
+        return buildTokenPair(user);
     }
 
     @Transactional(readOnly = true)
@@ -106,11 +108,11 @@ public class AuthService {
         );
     }
 
-    private AuthResponse buildAuthResponse(User user) {
+    private TokenPair buildTokenPair(User user) {
         String accessToken = jwtService.generateAccessToken(
             user.getId(), user.getEmail(), user.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(
             user.getId(), user.getEmail(), user.getRole().name());
-        return new AuthResponse(accessToken, refreshToken, UserMapper.toResponse(user));
+        return new TokenPair(accessToken, refreshToken, UserMapper.toResponse(user));
     }
 }

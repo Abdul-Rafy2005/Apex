@@ -31,6 +31,10 @@ public class User {
     @Column(nullable = false, length = 20)
     private UserRole role;
 
+    @Column(name = "leaderboard_visible", nullable = false)
+    @Builder.Default
+    private Boolean leaderboardVisible = true;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

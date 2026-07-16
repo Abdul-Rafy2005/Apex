@@ -33,6 +33,50 @@ class AuthIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void register_setsRefreshTokenCookie() throws Exception {
+        MockMvc mvc = mockMvc();
+        RegisterRequest req = new RegisterRequest("cookie@test.com", "password123", "Cookie User");
+
+        mvc.perform(post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.user.email").value("cookie@test.com"))
+                .andExpect(header().exists("Set-Cookie"))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("refresh_token=")))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("HttpOnly")))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("Secure")))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("SameSite=None")));
+    }
+
+    @Test
+    void login_setsRefreshTokenCookie() throws Exception {
+        MockMvc mvc = mockMvc();
+        mvc.perform(post("/api/v1/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    new RegisterRequest("logincookie@test.com", "password123", "Login Cookie"))))
+                .andExpect(status().isCreated());
+
+        mvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    new LoginRequest("logincookie@test.com", "password123"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(header().exists("Set-Cookie"))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("refresh_token=")))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("HttpOnly")));
+    }
+
+    @Test
     void register_login_refresh_flow() throws Exception {
         MockMvc mvc = mockMvc();
         RegisterRequest registerReq = new RegisterRequest("user1@test.com", "password123", "User One");
@@ -42,26 +86,34 @@ class AuthIntegrationTest extends IntegrationTestBase {
                 .content(objectMapper.writeValueAsString(registerReq)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andExpect(jsonPath("$.user.email").value("user1@test.com"))
                 .andReturn();
 
-        AuthResponse registerResponse = objectMapper.readValue(
-            registerResult.getResponse().getContentAsString(), AuthResponse.class);
+        // Extract refresh token from Set-Cookie header
+        String setCookie = registerResult.getResponse().getHeader("Set-Cookie");
+        String refreshToken = setCookie.split("refresh_token=")[1].split(";")[0];
 
-        mvc.perform(post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                    new LoginRequest("user1@test.com", "password123"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").isNotEmpty());
-
+        // Use refresh token cookie to get new access token
         mvc.perform(post("/api/v1/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                    new RefreshTokenRequest(registerResponse.refreshToken()))))
+                .cookie(new jakarta.servlet.http.Cookie("refresh_token", refreshToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").isNotEmpty());
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(header().exists("Set-Cookie"))
+                .andExpect(header().string("Set-Cookie",
+                    org.hamcrest.Matchers.containsString("refresh_token=")));
+    }
+
+    @Test
+    void refresh_withoutCookie_rejected() throws Exception {
+        mockMvc().perform(post("/api/v1/auth/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void refresh_withInvalidCookie_rejected() throws Exception {
+        mockMvc().perform(post("/api/v1/auth/refresh")
+                .cookie(new jakarta.servlet.http.Cookie("refresh_token", "invalid.token.here")))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -106,15 +158,6 @@ class AuthIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
-    void refresh_invalidToken_rejected() throws Exception {
-        mockMvc().perform(post("/api/v1/auth/refresh")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                    new RefreshTokenRequest("invalid.token.here"))))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
     void getMe_withValidToken_returnsProfile() throws Exception {
         MockMvc mvc = mockMvc();
         RegisterRequest req = new RegisterRequest("profile@test.com", "password123", "Profile User");
@@ -138,6 +181,6 @@ class AuthIntegrationTest extends IntegrationTestBase {
     @Test
     void getMe_withoutToken_rejected() throws Exception {
         mockMvc().perform(get("/api/v1/users/me"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

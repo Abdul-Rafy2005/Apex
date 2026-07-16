@@ -7,10 +7,15 @@ import com.abdulrafy.backend.analytics.dto.DailyPnlEntry;
 import com.abdulrafy.backend.analytics.entity.PerformanceSnapshot;
 import com.abdulrafy.backend.analytics.repository.PerformanceSnapshotRepository;
 import com.abdulrafy.backend.auth.entity.Portfolio;
+import com.abdulrafy.backend.auth.entity.User;
 import com.abdulrafy.backend.auth.repository.PortfolioRepository;
+import com.abdulrafy.backend.auth.repository.UserRepository;
+import com.abdulrafy.backend.leaderboard.service.LeaderboardService;
 import com.abdulrafy.backend.market.entity.Asset;
 import com.abdulrafy.backend.market.repository.AssetRepository;
 import com.abdulrafy.backend.market.service.MarketService;
+import com.abdulrafy.backend.organization.entity.Membership;
+import com.abdulrafy.backend.organization.repository.MembershipRepository;
 import com.abdulrafy.backend.trading.entity.Holding;
 import com.abdulrafy.backend.trading.entity.OrderSide;
 import com.abdulrafy.backend.trading.entity.Trade;
@@ -57,6 +62,9 @@ public class AnalyticsService {
     private final MarketService marketService;
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+    private final LeaderboardService leaderboardService;
+    private final MembershipRepository membershipRepository;
+    private final UserRepository userRepository;
 
     public AnalyticsService(PerformanceSnapshotRepository snapshotRepository,
                             TradeRepository tradeRepository,
@@ -64,7 +72,10 @@ public class AnalyticsService {
                             PortfolioRepository portfolioRepository,
                             AssetRepository assetRepository,
                             MarketService marketService,
-                            StringRedisTemplate redisTemplate) {
+                            StringRedisTemplate redisTemplate,
+                            LeaderboardService leaderboardService,
+                            MembershipRepository membershipRepository,
+                            UserRepository userRepository) {
         this.snapshotRepository = snapshotRepository;
         this.tradeRepository = tradeRepository;
         this.holdingRepository = holdingRepository;
@@ -72,6 +83,9 @@ public class AnalyticsService {
         this.assetRepository = assetRepository;
         this.marketService = marketService;
         this.redisTemplate = redisTemplate;
+        this.leaderboardService = leaderboardService;
+        this.membershipRepository = membershipRepository;
+        this.userRepository = userRepository;
 
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
@@ -117,7 +131,29 @@ public class AnalyticsService {
 
         log.info("Snapshot saved for portfolio {} on {}: return={}%, sharpe={}, risk={}",
                 portfolioId, today, saved.getTotalReturnPct(), saved.getSharpeRatio(), saved.getRiskScore());
+
+        updateLeaderboard(portfolioId, saved);
+
         return saved;
+    }
+
+    private void updateLeaderboard(UUID portfolioId, PerformanceSnapshot snapshot) {
+        try {
+            UUID userId = portfolioRepository.findUserIdByPortfolioId(portfolioId).orElse(null);
+            if (userId == null) return;
+
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) return;
+
+            // Find user's org membership
+            List<Membership> memberships = membershipRepository.findByUserId(userId);
+            for (Membership m : memberships) {
+                leaderboardService.updateScore(m.getOrganization().getId(), userId,
+                        snapshot.getTotalReturnPct().doubleValue());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to update leaderboard for portfolio {}: {}", portfolioId, e.getMessage());
+        }
     }
 
     private PerformanceSnapshot findOrCreateSnapshot(UUID portfolioId, LocalDate date) {

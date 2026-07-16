@@ -1,20 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { subscribe, unsubscribe } from '@/lib/websocket';
-import type { TradeExecutedEvent } from '../types/event';
 
 const PORTFOLIO_DEST = '/user/queue/portfolio';
 
 export function usePortfolioStream() {
-  const [events, setEvents] = useState<TradeExecutedEvent[]>([]);
+  const queryClient = useQueryClient();
 
-  const handleEvent = useCallback((body: string) => {
-    try {
-      const event: TradeExecutedEvent = JSON.parse(body);
-      setEvents((prev) => [event, ...prev]);
-    } catch {
-      // Malformed message — ignore
-    }
-  }, []);
+  const handleEvent = useCallback(
+    (body: string) => {
+      try {
+        void JSON.parse(body);
+        queryClient.invalidateQueries({ queryKey: ['portfolio'] });
+        queryClient.invalidateQueries({ queryKey: ['trades'] });
+        queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
+      } catch {
+        // Malformed message — ignore
+      }
+    },
+    [queryClient],
+  );
 
   useEffect(() => {
     const sub = subscribe(PORTFOLIO_DEST, handleEvent);
@@ -24,6 +29,4 @@ export function usePortfolioStream() {
       unsubscribe(PORTFOLIO_DEST);
     };
   }, [handleEvent]);
-
-  return events;
 }

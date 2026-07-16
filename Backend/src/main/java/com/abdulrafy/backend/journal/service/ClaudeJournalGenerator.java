@@ -38,6 +38,11 @@ public class ClaudeJournalGenerator implements AiJournalGenerator {
 
     @Override
     public String generateNarrative(JournalMetrics metrics) {
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new com.abdulrafy.backend.common.exception.ServiceUnavailableException(
+                    "Journal generation service is not configured: ANTHROPIC_API_KEY is missing");
+        }
+
         String prompt = buildPrompt(metrics);
 
         try {

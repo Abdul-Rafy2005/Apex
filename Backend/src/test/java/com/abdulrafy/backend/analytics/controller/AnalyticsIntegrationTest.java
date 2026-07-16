@@ -226,6 +226,6 @@ class AnalyticsIntegrationTest extends IntegrationTestBase {
     @Test
     void analyticsSummary_unauthenticated_rejected() throws Exception {
         mockMvc.perform(get("/api/v1/analytics/summary"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

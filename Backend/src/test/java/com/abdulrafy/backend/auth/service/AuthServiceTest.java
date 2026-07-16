@@ -61,7 +61,7 @@ class AuthServiceTest {
         when(jwtService.generateAccessToken(any(), any(), any())).thenReturn("access-token");
         when(jwtService.generateRefreshToken(any(), any(), any())).thenReturn("refresh-token");
 
-        AuthResponse response = authService.register(
+        AuthService.TokenPair response = authService.register(
             new RegisterRequest("test@example.com", "password123", "Test User"));
 
         assertThat(response.accessToken()).isEqualTo("access-token");
@@ -95,7 +95,7 @@ class AuthServiceTest {
         when(jwtService.generateAccessToken(any(), any(), any())).thenReturn("access-token");
         when(jwtService.generateRefreshToken(any(), any(), any())).thenReturn("refresh-token");
 
-        AuthResponse response = authService.login(new LoginRequest("test@example.com", "password123"));
+        AuthService.TokenPair response = authService.login(new LoginRequest("test@example.com", "password123"));
 
         assertThat(response.accessToken()).isEqualTo("access-token");
     }
