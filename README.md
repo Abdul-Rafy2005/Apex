@@ -1,6 +1,6 @@
 <div align="center">
-  <!-- Note: Replace the image src below with a link to your actual logo if you have one! -->
-  <img src="https://via.placeholder.com/150x150/111827/61DAFB?text=Apex+Logo" alt="Apex Logo" width="120" height="120" style="border-radius: 20%; margin-bottom: 20px;" />
+
+  <img src="apex_logo.png" alt="Apex Dashboard" width="120" height="120" style="border-radius: 20%; margin-bottom: 20px;" />
   
   <h1>Apex Trading Intelligence</h1>
   
@@ -49,10 +49,8 @@ While many portfolio projects are simple CRUD apps, **Apex tackles real-world di
 
 ## 📸 Platform Interface
 
-> **Note to Developer:** Please replace these placeholder image links with actual screenshots or GIFs of your running application! A GIF of live price updates or trade execution goes a long way.
-
 <p align="center">
-  <img src="https://via.placeholder.com/800x450/111827/61DAFB?text=Insert+Dashboard+Screenshot+Here" alt="Apex Dashboard UI" />
+  <img src="Apex.png" alt="Apex Dashboard UI" />
 </p>
 <p align="center">
   <em>Dark-mode optimized, responsive dashboard powered by React 19, Tailwind CSS, and TradingView Lightweight Charts.</em>
