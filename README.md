@@ -1,57 +1,86 @@
 <div align="center">
+  <!-- Note: Replace the image src below with a link to your actual logo if you have one! -->
+  <img src="https://via.placeholder.com/150x150/111827/61DAFB?text=Apex+Logo" alt="Apex Logo" width="120" height="120" style="border-radius: 20%; margin-bottom: 20px;" />
   
-  # Apex Trading Platform
+  <h1>Apex Trading Intelligence</h1>
   
-  **An Enterprise-Grade, Real-Time Market Simulation & Portfolio Intelligence Platform**
+  <p><b>An Enterprise-Grade, Real-Time Market Simulation & Portfolio Intelligence Platform</b></p>
 
-  [![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
-  [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-  [![React 19](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-  [![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=flat-square&logo=redis&logoColor=white)](https://redis.io/)
-  [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-FF6600?style=flat-square&logo=rabbitmq&logoColor=white)](https://www.rabbitmq.com/)
-  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
+  <!-- Badges -->
+  <p>
+    <a href="https://openjdk.org/projects/jdk/21/"><img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21" /></a>
+    <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" /></a>
+    <a href="https://react.dev/"><img src="https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+    <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" /></a>
+    <a href="https://redis.io/"><img src="https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" /></a>
+    <a href="https://www.rabbitmq.com/"><img src="https://img.shields.io/badge/RabbitMQ-3.13-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white" alt="RabbitMQ" /></a>
+    <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
+  </p>
 
-  *Apex bridges the gap between novice trading applications and professional institutional platforms. It provides a highly realistic, zero-risk financial simulation environment packed with enterprise software patterns, AI-driven behavioral insights, and real-time data streaming.*
+  <p>
+    <em>Apex bridges the gap between novice trading applications and professional institutional platforms. <br/> It provides a highly realistic, zero-risk financial simulation environment packed with enterprise software patterns, AI-driven behavioral insights, and real-time data streaming.</em>
+  </p>
   
-  [Key Technical Achievements](#-why-apex-the-recruiters-tldr) · [Architecture](#-system-architecture) · [Getting Started](#-getting-started) · [API Documentation](#-api-documentation)
+  <p>
+    <a href="#-why-apex-the-recruiters-tldr"><strong>Value Proposition</strong></a> · 
+    <a href="#-technical-showcase"><strong>Technical Showcase</strong></a> · 
+    <a href="#-system-architecture"><strong>Architecture</strong></a> · 
+    <a href="#-getting-started"><strong>Quick Start</strong></a>
+  </p>
 </div>
 
 ---
 
 ## 💡 Why Apex? (The Recruiter's TL;DR)
 
-Apex was built to demonstrate proficiency in **modern full-stack enterprise development**, focusing heavily on scalability, data integrity, and complex system integrations. 
+Apex was engineered from the ground up to demonstrate proficiency in **modern full-stack enterprise development**, focusing on the rigorous demands of FinTech systems: **scalability, data integrity, low latency, and complex system integrations.** 
 
-Instead of building a simple CRUD application, Apex tackles real-world distributed system challenges:
-- **Event-Driven Asynchronous Processing:** Uses **RabbitMQ** to decouple heavy analytics processing and notifications from the main trading thread, ensuring microsecond order execution latency.
-- **High-Performance Caching:** Leverages **Redis** to cache aggressive global market data polling (via CoinGecko), protecting external API rate limits and providing instant `<10ms` data retrieval to the frontend.
-- **Real-Time WebSockets (STOMP):** Pushes live price ticks, portfolio valuation updates, and executed trade notifications to connected React clients in real-time.
-- **Generative AI Integration:** Uses the **Google Gemini 1.5** LLM API to analyze a trader's daily performance metrics and generate personalized, behavioral trading psychology feedback.
-- **Enterprise Data Integrity:** Enforces **idempotent** API designs (preventing duplicate trades on network retries), optimistic locking for concurrent portfolio updates, and strict multi-tenant isolation at the database query level.
-- **Strictly Typed & Tested:** Backed by over 230+ automated tests (JUnit, Mockito, Testcontainers, React Testing Library) ensuring robust CI/CD pipelines.
+While many portfolio projects are simple CRUD apps, **Apex tackles real-world distributed system challenges**:
+
+*   ⚡ **Event-Driven Microsecond Latency:** Uses **RabbitMQ** to decouple heavy analytics processing and notifications from the main trading thread, ensuring instantaneous order execution.
+*   🛡️ **Enterprise Data Integrity & ACID Compliance:** Enforces **idempotent** API designs (preventing duplicate trades on network retries), optimistic locking for concurrent portfolio updates, and strict multi-tenant isolation at the query level.
+*   🔥 **High-Performance Caching:** Leverages **Redis** to cache aggressive global market data polling (via CoinGecko), protecting external API rate limits and guaranteeing `<10ms` data retrieval.
+*   📡 **Real-Time Data Streaming:** Utilizes **WebSockets (STOMP)** to push live price ticks, portfolio valuation updates, and executed trade notifications to connected React clients with zero polling overhead.
+*   🧠 **Generative AI Integration:** Uses the **Google Gemini 1.5** LLM API to analyze a trader's mathematical daily performance metrics and generate personalized, behavioral trading psychology feedback.
+*   🧪 **Production-Ready Testing:** Backed by over **230+ automated tests** (JUnit 5, Mockito, Testcontainers, React Testing Library) ensuring robust, refactor-safe code.
 
 ---
 
-## 🛠 Tech Stack
+## 📸 Platform Interface
 
-| Layer | Technologies |
-|-------|--------------|
-| **Backend Core** | Java 21, Spring Boot 3.x, Spring Security (JWT), Spring Data JPA, Flyway |
-| **Data & Messaging** | PostgreSQL 16 (Relational), Redis 7 (Caching & Pub/Sub), RabbitMQ (Message Queue) |
-| **Real-Time Data** | WebSockets (STOMP/SockJS), Scheduled Cron Jobs, CoinGecko REST API |
-| **AI Integration** | Google Gemini 1.5 Flash (Generative Language API) |
-| **Frontend Core** | React 19, TypeScript (Strict), Vite, Tailwind CSS, Headless UI |
-| **State Management** | TanStack Query (Server State), Zustand (Client State) |
-| **DevOps & Infra** | Docker, Docker Compose, Nginx, GitHub Actions |
-| **Testing** | JUnit 5, Mockito, Testcontainers, Vitest, React Testing Library |
+> **Note to Developer:** Please replace these placeholder image links with actual screenshots or GIFs of your running application! A GIF of live price updates or trade execution goes a long way.
+
+<p align="center">
+  <img src="https://via.placeholder.com/800x450/111827/61DAFB?text=Insert+Dashboard+Screenshot+Here" alt="Apex Dashboard UI" />
+</p>
+<p align="center">
+  <em>Dark-mode optimized, responsive dashboard powered by React 19, Tailwind CSS, and TradingView Lightweight Charts.</em>
+</p>
+
+---
+
+<h2 id="-technical-showcase">🛠 Technology Stack & Justification</h2>
+
+Every technology in Apex was chosen to solve a specific engineering problem:
+
+| Layer | Technologies | Engineering Justification |
+|-------|--------------|---------------------------|
+| **Backend Core** | Java 21, Spring Boot 3.x, Spring Security (JWT) | Provides a robust, strictly typed, and secure foundation with built-in dependency injection and MVC architecture. |
+| **Primary Database** | PostgreSQL 16, Spring Data JPA, Flyway | Ensures ACID compliance for financial transactions and strict relational data integrity. Flyway manages schema migrations. |
+| **Caching Layer** | Redis 7 | Drastically reduces read latency for frequently accessed market data and user sessions. |
+| **Message Broker** | RabbitMQ | Enables asynchronous, event-driven architecture, decoupling trade execution from heavy post-trade analytics. |
+| **Real-Time Data** | WebSockets (STOMP/SockJS), CoinGecko REST | Pushes live market ticks to clients without the overhead of HTTP polling. |
+| **AI / ML** | Google Gemini 1.5 Flash | Provides cutting-edge Generative AI capabilities for behavioral trading analysis. |
+| **Frontend Core** | React 19, TypeScript, Vite, Tailwind CSS | Delivers a lightning-fast, type-safe Single Page Application (SPA) with a modern, responsive UI. |
+| **State & API** | TanStack Query, Zustand | Manages complex server-state caching and global client-state seamlessly. |
+| **DevOps** | Docker, Docker Compose, Nginx | Fully containerized environment ensures "it works on my machine" translates to "it works everywhere". |
 
 ---
 
 ## 🏗 System Architecture
 
-Apex utilizes a modular, event-driven monolith design that is prepared for future microservice extraction.
+Apex utilizes a modular, event-driven monolith design that is structurally prepared for future microservice extraction.
 
 ```mermaid
 graph TD
@@ -84,22 +113,22 @@ graph TD
 
 ## ✨ Standout Features
 
-- **Live Global Market Search:** Search the entire CoinGecko database live and instantly add any global asset (e.g., Solana, Dogecoin) to the PostgreSQL database for real-time tracking.
-- **Advanced Portfolio Analytics:** Real-time calculation of professional metrics including Sharpe Ratio, Maximum Drawdown, Win Rate, and FIFO-matched Profit/Loss.
-- **AI Trading Journal:** Daily behavioral narratives generated by Google Gemini, summarizing the trader's psychological performance based on their mathematical metrics.
-- **Role-Based Access Control (RBAC):** Distinct permissions for Super Admins, Organization Admins, Instructors, and Traders.
-- **Interactive Data Visualization:** Lightweight, high-performance financial charts (OHLCV) powered by TradingView's Lightweight Charts library.
+*   🌍 **Live Global Market Search:** Search the entire CoinGecko database live and instantly add any global asset (e.g., Solana, NVIDIA) to the PostgreSQL database for real-time tracking.
+*   📊 **Advanced Portfolio Analytics:** Real-time calculation of professional metrics including Sharpe Ratio, Maximum Drawdown, Win Rate, and FIFO-matched Profit/Loss.
+*   🤖 **AI Trading Journal:** Daily behavioral narratives generated by Google Gemini, summarizing the trader's psychological performance based on their mathematical metrics.
+*   🔐 **Role-Based Access Control (RBAC):** Distinct permissions and granular access controls for Super Admins, Organization Admins, Instructors, and Traders.
+*   📈 **Interactive Data Visualization:** Lightweight, high-performance financial charts (OHLCV) powered by TradingView's Lightweight Charts library.
 
 ---
 
 ## 🚀 Getting Started
 
-Apex is fully containerized. You can spin up the entire enterprise stack with a single command.
+Apex is fully containerized. You can spin up the entire enterprise stack locally with a single command, without worrying about dependency conflicts.
 
 ### Prerequisites
-- Docker and Docker Compose
-- Node.js 20+ (for local frontend development)
-- Java 21 (for local backend development)
+- [Docker](https://www.docker.com/) and Docker Compose
+- Node.js 20+ (optional, for local frontend development)
+- Java 21 (optional, for local backend development)
 
 ### One-Click Deployment
 
@@ -112,25 +141,25 @@ Apex is fully containerized. You can spin up the entire enterprise stack with a 
 2. **Configure Environment Variables:**
    ```bash
    cp .env.example .env
-   # Add your Google Gemini API Key and a secure JWT Secret to the .env file
+   # Open .env and add your Google Gemini API Key and a secure JWT Secret
    ```
 
 3. **Launch the Infrastructure:**
    ```bash
    docker compose up -d --build
    ```
-   *This single command builds the Java backend, compiles the React frontend, and spins up PostgreSQL, Redis, RabbitMQ, and Nginx.*
+   *This single command builds the Java backend, compiles the React frontend, and spins up PostgreSQL, Redis, RabbitMQ, and Nginx reverse proxy.*
 
 4. **Access the Platform:**
-   - Frontend UI: `http://localhost:5173` (Dev) or mapped Docker port
-   - Backend API: `http://localhost:8080/api/v1`
-   - Swagger Documentation: `http://localhost:8080/api/v1/swagger-ui.html`
+   - **Frontend UI:** `http://localhost:5173` (Or the port mapped by Docker)
+   - **Backend API:** `http://localhost:8080/api/v1`
+   - **Swagger/OpenAPI Documentation:** `http://localhost:8080/api/v1/swagger-ui.html`
 
 ---
 
 ## 🧪 Testing Strategy
 
-Apex treats testing as a first-class citizen. 
+Apex treats testing as a first-class citizen, demonstrating production-ready engineering standards.
 
 - **Backend (131+ Tests):** Includes Mockito unit tests for isolated business logic, and Testcontainers for integration tests against real PostgreSQL and Redis instances. Validates concurrency (optimistic locking), idempotency, and cross-tenant security.
   ```bash
@@ -144,5 +173,6 @@ Apex treats testing as a first-class citizen.
 ---
 
 <div align="center">
-  <b>Built with precision. Designed for scale.</b>
+  <b>Built with precision. Designed for scale.</b><br><br>
+  <a href="https://github.com/abdul-rafy2005">GitHub Profile</a> • <a href="mailto:your.email@example.com">Contact Developer</a>
 </div>
