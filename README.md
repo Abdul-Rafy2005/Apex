@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="apex_logo.png" alt="Apex Dashboard" width="200" height="200" style="border-radius: 20%; margin-bottom: 20px;" />
+  <img src="apex_logo.png" alt="Apex Dashboard" width="500" height="500" style="border-radius: 20%; margin-bottom: 20px;" />
   
   <h1>Apex Trading Intelligence</h1>
   
