@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="apex_logo.png" alt="Apex Logo" width="120" height="120" />
+  <img src="apex_logo.png" alt="Apex Logo" width="500" height="500" />
   
   <h1>Apex Trading Intelligence</h1>
   
