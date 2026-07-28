@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GeminiJournalGeneratorUnitTest {
 
     private final GeminiJournalGenerator generator = new GeminiJournalGenerator(
-            "test-key", "gemini-2.5-flash", new tools.jackson.databind.ObjectMapper());
+            "test-key", "gemini-2.5-flash-lite", new tools.jackson.databind.ObjectMapper());
 
     @Test
     void buildPrompt_containsAllMetricsFields() {

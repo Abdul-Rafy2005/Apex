@@ -27,7 +27,7 @@ public class GeminiJournalGenerator implements AiJournalGenerator {
 
     public GeminiJournalGenerator(
             @Value("${gemini.api-key:}") String apiKey,
-            @Value("${gemini.model:gemini-2.5-flash}") String model,
+            @Value("${gemini.model:gemini-2.5-flash-lite}") String model,
             ObjectMapper objectMapper) {
         this.apiKey = apiKey;
         this.model = model;

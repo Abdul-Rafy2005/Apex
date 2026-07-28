@@ -62,7 +62,7 @@ apex:
     provider: ${JOURNAL_PROVIDER:gemini}
   gemini:
     api-key: ${GEMINI_API_KEY:}
-    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    model: ${GEMINI_MODEL:gemini-2.5-flash-lite}
 
 server:
   port: 8080
