@@ -20,6 +20,9 @@
   <p>
     <em>Apex bridges the gap between novice trading applications and professional institutional platforms.<br/>It provides a highly realistic, zero-risk financial simulation environment packed with enterprise software patterns, AI-driven behavioral insights, and real-time data streaming.</em>
   </p>
+
+
+  ![Apex architecture](architecture.png)
   
   <p>
     <a href="#-why-apex-the-recruiters-tldr"><strong>Value Proposition</strong></a> &middot; 
