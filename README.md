@@ -20,9 +20,6 @@
   <p>
     <em>Apex bridges the gap between novice trading applications and professional institutional platforms.<br/>It provides a highly realistic, zero-risk financial simulation environment packed with enterprise software patterns, AI-driven behavioral insights, and real-time data streaming.</em>
   </p>
-
-
-  ![Apex architecture](architecture.png)
   
   <p>
     <a href="#-why-apex-the-recruiters-tldr"><strong>Value Proposition</strong></a> &middot; 
@@ -34,7 +31,9 @@
 
 ---
 
-## Why Apex? (The Recruiter's TL;DR)
+## 
+
+<h2 id="-why-apex-the-recruiters-tldr">Why Apex? (The Recruiter's TL;DR)</h2>
 
 Apex was engineered from the ground up to demonstrate proficiency in **modern full-stack enterprise development**, focusing on the rigorous demands of FinTech systems: **scalability, data integrity, low latency, and complex system integrations.**
 
@@ -92,34 +91,12 @@ Every technology in Apex was chosen to solve a specific engineering problem:
 
 ---
 
-## System Architecture
+
+<h2 id="-system-architectur">System Architecture</h2>
 
 Apex utilizes a modular, event-driven monolith design that is structurally prepared for future microservice extraction.
 
-```
-React + Vite SPA
-    |
-    |--- REST (JSON) ---> Spring Boot Controller
-    |--- WebSocket (STOMP) ---> WebSocket Handler
-                                  |
-                          JWT Security Filter
-                                  |
-                          Business Logic Layer
-                            /     |       \
-                  Cache Miss   Read/Write   Publish Event
-                     |            |              |
-               CoinGecko API  PostgreSQL    RabbitMQ
-                     |            |              |
-                  Redis      Write Metrics   Analytics Engine
-                                    |              |
-                              Write Metrics  <--  |
-                                    |
-                          Send Metrics
-                              |
-                     Gemini 2.5 Flash Lite
-                              |
-                       Return Narrative
-```
+![Apex architecture](architecture.png)
 
 ### Core Design Principles
 
@@ -139,7 +116,8 @@ React + Vite SPA
 
 ---
 
-## Getting Started
+<h2 id="-getting-started">Getting Started</h2>
+
 
 Apex is fully containerized. You can spin up the entire enterprise stack locally with a single command, without worrying about dependency conflicts.
 
