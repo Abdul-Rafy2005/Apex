@@ -21,11 +21,11 @@
    ![Apex architecture](architecture.png)
 
   <p>
-    <a href="#-live-demo"><strong>Demo</strong></a> &middot;
-    <a href="#-system-architecture"><strong>Architecture</strong></a> &middot;
-    <a href="#-trade-execution-flow"><strong>Trade Flow</strong></a> &middot;
-    <a href="#-key-metrics"><strong>Metrics</strong></a> &middot;
-    <a href="#-getting-started"><strong>Quick Start</strong></a>
+    <a href="#live-demo"><strong>Demo</strong></a> &middot;
+    <a href="#system-architecture"><strong>Architecture</strong></a> &middot;
+    <a href="#trade-execution-flow"><strong>Trade Flow</strong></a> &middot;
+    <a href="#key-metrics"><strong>Metrics</strong></a> &middot;
+    <a href="#getting-started"><strong>Quick Start</strong></a>
   </p>
 </div>
 
