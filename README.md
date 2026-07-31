@@ -18,6 +18,8 @@
     <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" /></a>
   </p>
 
+   ![Apex architecture](architecture_argent.png)
+
   <p>
     <a href="#-live-demo"><strong>Demo</strong></a> &middot;
     <a href="#-system-architecture"><strong>Architecture</strong></a> &middot;
