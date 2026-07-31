@@ -92,7 +92,7 @@ Every technology in Apex was chosen to solve a specific engineering problem:
 ---
 
 
-<h2 id="-system-architectur">System Architecture</h2>
+<h2 id="-system-architecture">System Architecture</h2>
 
 Apex utilizes a modular, event-driven monolith design that is structurally prepared for future microservice extraction.
 
